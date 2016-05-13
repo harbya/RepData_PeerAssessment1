@@ -1,11 +1,5 @@
 ---
 output: 
-  html_document: 
-    fig_caption: yes
-    keep_md: yes
----
----
-output: 
   html_document:
   keep_md : true
   ---
@@ -13,7 +7,8 @@ output:
 
 
 ## Loading and preprocessing the data
-```{r} 
+
+```r
 activity <- read.csv("../RepData_PeerAssessment1/activity.csv")
 ```
 
@@ -21,17 +16,32 @@ activity <- read.csv("../RepData_PeerAssessment1/activity.csv")
 
 1. Make a histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 SummaryPerDay <- aggregate(steps ~ date, data=activity, FUN=sum)
 barplot(SummaryPerDay$steps, names.arg=SummaryPerDay$date, xlab="Total Steps each Day", ylab="Frequency",col="dark red")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
 2. Calculate and report the **mean** and **median** total number of
    steps taken per day
 
-```{r}
+
+```r
 mean(SummaryPerDay$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(SummaryPerDay$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
@@ -40,16 +50,24 @@ median(SummaryPerDay$steps)
    interval (x-axis) and the average number of steps taken, averaged
    across all days (y-axis)
 
-```{r}
+
+```r
 SummaryInterval <- aggregate(steps ~ interval, data=activity, FUN=mean)
 plot(SummaryInterval, type="l",col="red")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 2. Which 5-minute interval, on average across all the days in the
    dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 SummaryInterval$interval[which.max(SummaryInterval$steps)]
+```
+
+```
+## [1] 835
 ```
 
 
@@ -58,8 +76,13 @@ SummaryInterval$interval[which.max(SummaryInterval$steps)]
 1. Calculate and report the total number of missing values in the
    dataset (i.e. the total number of rows with `NA`s)
 
-```{r}
+
+```r
 sum(is.na(activity))
+```
+
+```
+## [1] 2304
 ```
 
 2. Devise a strategy for filling in all of the missing values in the
@@ -71,15 +94,20 @@ sum(is.na(activity))
 3. Create a new dataset that is equal to the original dataset but with
    the missing data filled in.
 
-```{r}
 
+```r
 ActivityTidy <- activity
 ActivityTidy$steps[is.na(ActivityTidy$steps)] <- 
     tapply(ActivityTidy$steps, ActivityTidy$interval, mean, na.rm = TRUE)
 ```
 
-```{r}	
+
+```r
 sum(is.na(ActivityTidy))
+```
+
+```
+## [1] 0
 ```
 
 4. Make a histogram of the total number of steps taken each day and
@@ -89,7 +117,8 @@ sum(is.na(ActivityTidy))
    missing data on the estimates of the total daily number of steps?
 
   
-```{r}
+
+```r
 SummaryDate <- aggregate(steps ~ date, data=activity, FUN=sum)
 MeanValue = round(mean(SummaryDate$steps), 1)
 MedianValue = round(median(SummaryDate$steps), 1)
@@ -97,12 +126,26 @@ barplot(SummaryDate$steps, names.arg=SummaryDate$date, xlab="Dates", ylab="Frequ
 abline(h=MedianValue, lwd = 3, col = 'yellow')
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
 	The mean and the median are quite close therefore the yellow line demarks both.
 
 
-```{r}
+
+```r
 mean(SummaryDate$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(SummaryDate$steps)
+```
+
+```
+## [1] 10765
 ```
 
 The impact of the missing data seems rather low, at least when
@@ -115,7 +158,8 @@ estimating the total number of steps per day.
    "weekday" and "weekend" indicating whether a given date is a
    weekday or weekend day.
 
-```{r}
+
+```r
 DayType <- function(date) {
     if (weekdays(as.Date(date)) %in% c("Saturday", "Sunday")) {
         "weekend"
@@ -125,8 +169,6 @@ DayType <- function(date) {
 }
 
 ActivityTidy$DayType <- as.factor(sapply(activity$date, DayType))
-
-
 ```
 
 2. Make a panel plot containing a time series plot (i.e. `type = "l"`)
@@ -134,8 +176,8 @@ ActivityTidy$DayType <- as.factor(sapply(activity$date, DayType))
    taken, averaged across all weekday days or weekend days
    (y-axis).
 
-```{r}
 
+```r
 par(mfrow=c(2,1))
 for (type in c("weekend", "weekday")) {
     SummaryActivityType <- aggregate(steps ~ interval,
@@ -144,5 +186,6 @@ for (type in c("weekend", "weekday")) {
                             FUN=mean)
 plot(SummaryActivityType, type="l", main=type,col="dark red")
 }
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
